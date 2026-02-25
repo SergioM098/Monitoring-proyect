@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { ParticlePlanet } from '../components/effects/ParticlePlanet';
 
 export function Login() {
@@ -9,6 +10,7 @@ export function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+  const { theme } = useTheme();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -33,7 +35,7 @@ export function Login() {
       <div className="w-full max-w-sm animate-fade-in relative z-10">
         {/* Logo */}
         <div className="flex flex-col items-center mb-8">
-          <img src="/logo.svg" alt="WOW Desarrollo Digital" className="h-16 mb-2" />
+          <img src={theme === 'light' ? '/logo-dark.svg' : '/logo.svg'} alt="WOW Desarrollo Digital" className="h-16 mb-2" />
           <span className="text-[13px] mt-1" style={{ color: 'var(--text-muted)' }}>Panel de monitoreo</span>
         </div>
 
@@ -46,8 +48,11 @@ export function Login() {
           <h2 className="text-[17px] font-medium" style={{ color: 'var(--text-primary)' }}>Iniciar sesion</h2>
 
           {error && (
-            <div className="bg-red-400/10 border border-red-400/20 text-red-400 px-3 py-2 rounded-lg text-[14px] animate-fade-in">
-              {error}
+            <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-lg text-[14px] animate-shake flex items-center gap-2.5">
+              <svg className="w-5 h-5 shrink-0 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+              </svg>
+              <span className="font-medium">{error}</span>
             </div>
           )}
 

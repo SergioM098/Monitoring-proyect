@@ -4,7 +4,6 @@ import { useCheckHistory } from '../hooks/useCheckHistory';
 import { useAuth } from '../context/AuthContext';
 import { StatusBadge } from '../components/servers/StatusBadge';
 import { ResponseTimeChart } from '../components/checks/ResponseTimeChart';
-import { ServerForm } from '../components/servers/ServerForm';
 import api, { downloadCsv } from '../api/client';
 import type { Server, NotificationSetting, Check } from '../types';
 
@@ -24,7 +23,6 @@ export function ServerDetail() {
   const [notifications, setNotifications] = useState<NotificationSetting[]>([]);
   const [newDest, setNewDest] = useState('');
   const [newTrigger, setNewTrigger] = useState('down');
-  const [editing, setEditing] = useState(false);
 
   const [page, setPage] = useState(0);
   const [pageChecks, setPageChecks] = useState<Check[]>([]);
@@ -50,10 +48,6 @@ export function ServerDetail() {
     api.get(`/servers/${id}`).then(({ data }) => setServer(data));
     api.get(`/notifications/${id}`).then(({ data }) => setNotifications(data));
   }, [id]);
-
-  const refreshServer = () => {
-    api.get(`/servers/${id}`).then(({ data }) => setServer(data));
-  };
 
   const addNotification = async () => {
     if (!newDest) return;
@@ -114,8 +108,8 @@ export function ServerDetail() {
               </div>
             </div>
             {isAdmin && (
-              <button
-                onClick={() => setEditing(true)}
+              <Link
+                to={`/servers/${id}/edit`}
                 className="px-4 py-2 text-[14px] font-medium rounded-lg transition-all flex items-center gap-2"
                 style={{ background: 'var(--border)', color: 'var(--text-primary)' }}
               >
@@ -123,7 +117,7 @@ export function ServerDetail() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                 </svg>
                 Editar
-              </button>
+              </Link>
             )}
           </div>
         </div>
@@ -306,10 +300,6 @@ export function ServerDetail() {
           </div>
         )}
       </div>
-
-      {editing && (
-        <ServerForm server={server} onClose={() => { setEditing(false); refreshServer(); }} />
-      )}
     </div>
   );
 }

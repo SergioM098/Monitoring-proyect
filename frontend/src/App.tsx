@@ -7,6 +7,7 @@ import { Layout } from './components/layout/Layout';
 import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { ServerDetail } from './pages/ServerDetail';
+import { ServerEdit } from './pages/ServerEdit';
 import { Settings } from './pages/Settings';
 import { UserManagement } from './pages/UserManagement';
 import { Incidents } from './pages/Incidents';
@@ -34,6 +35,14 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <Layout><ServerDetail /></Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/servers/:id/edit"
+              element={
+                <ProtectedRoute>
+                  <Layout><ServerEdit /></Layout>
                 </ProtectedRoute>
               }
             />

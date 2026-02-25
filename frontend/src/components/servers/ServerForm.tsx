@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import api from '../../api/client';
 import type { Server } from '../../types';
 
@@ -47,14 +48,14 @@ export function ServerForm({ onClose, server }: Props) {
 
   const inputClass = "w-full bg-[var(--bg-input)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-[15px] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[#E1A72C] transition-all";
 
-  return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 px-4" onClick={onClose}>
+  return createPortal(
+    <div className="fixed inset-0 flex items-center justify-center z-[100] px-4" onClick={onClose}>
       {/* Backdrop with blur */}
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
       {/* Modal */}
       <div
-        className="glass rounded-xl w-full max-w-md relative animate-fade-in-scale"
+        className="glass rounded-xl w-full max-w-md relative animate-fade-in-scale max-h-[90vh] overflow-y-auto"
         style={{ boxShadow: '0 16px 64px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(42, 63, 84, 0.3)' }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -198,6 +199,7 @@ export function ServerForm({ onClose, server }: Props) {
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

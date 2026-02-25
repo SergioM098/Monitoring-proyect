@@ -48,9 +48,10 @@ const metricCards = [
 ];
 
 export function Dashboard() {
-  const { servers, loading } = useServers();
+  const { servers, loading, refetch } = useServers();
   const { isAdmin } = useAuth();
   const [showForm, setShowForm] = useState(false);
+  const [checkFilter, setCheckFilter] = useState<string>('all');
 
   const counts: Record<string, number> = {
     total: servers.length,
@@ -134,6 +135,31 @@ export function Dashboard() {
         ))}
       </div>
 
+      {/* Filters */}
+      {servers.length > 0 && (
+        <div className="flex items-center gap-2 mb-4 animate-fade-in">
+          <svg className="w-4 h-4" style={{ color: 'var(--text-muted)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
+          </svg>
+          {['all', 'http', 'tcp', 'ping'].map((type) => (
+            <button
+              key={type}
+              onClick={() => setCheckFilter(type)}
+              className={`px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all ${
+                checkFilter === type
+                  ? 'bg-gradient-to-r from-[#E1A72C] to-[#C98B1E] text-white shadow-sm shadow-[#E1A72C]/20'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-input)]'
+              }`}
+            >
+              {type === 'all' ? 'Todos' : type.toUpperCase()}
+              <span className={`ml-1.5 text-[11px] ${checkFilter === type ? 'text-white/70' : ''}`} style={checkFilter !== type ? { color: 'var(--text-muted)' } : undefined}>
+                {type === 'all' ? servers.length : servers.filter((s) => s.checkType === type).length}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Server grid */}
       {servers.length === 0 ? (
         <div className="card-static text-center py-16 animate-fade-in">
@@ -147,15 +173,17 @@ export function Dashboard() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {servers.map((server, i) => (
-            <div key={server.id} className={`animate-fade-in stagger-${Math.min(i + 1, 8)}`}>
-              <ServerCard server={server} />
-            </div>
-          ))}
+          {servers
+            .filter((s) => checkFilter === 'all' || s.checkType === checkFilter)
+            .map((server, i) => (
+              <div key={server.id} className={`animate-fade-in stagger-${Math.min(i + 1, 8)}`}>
+                <ServerCard server={server} />
+              </div>
+            ))}
         </div>
       )}
 
-      {showForm && <ServerForm onClose={() => setShowForm(false)} />}
+      {showForm && <ServerForm onClose={() => { setShowForm(false); refetch(); }} />}
     </div>
   );
 }

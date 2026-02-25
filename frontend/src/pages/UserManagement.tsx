@@ -198,11 +198,10 @@ export function UserManagement() {
               return (
                 <div key={user.id} className="px-5 py-4 flex items-center gap-4 table-row-hover transition-colors">
                   {/* Avatar */}
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-[15px] font-bold uppercase shrink-0 ${
-                    user.role === 'admin'
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-[15px] font-bold uppercase shrink-0 ${user.role === 'admin'
                       ? 'bg-gradient-to-br from-[#E1A72C]/20 to-[#E1A72C]/5 text-[#E1A72C] border border-[#E1A72C]/20'
                       : 'bg-blue-400/10 text-blue-400 border border-blue-400/20'
-                  }`}>
+                    }`}>
                     {user.name?.charAt(0) ?? '?'}
                   </div>
 
@@ -223,9 +222,8 @@ export function UserManagement() {
                       value={user.role}
                       onChange={(e) => handleRoleChange(user.id, e.target.value)}
                       disabled={isSelf}
-                      className={`bg-[var(--bg-input)] border rounded-lg px-3 py-1.5 text-[13px] disabled:opacity-50 focus:outline-none focus:border-[#E1A72C] transition-all font-medium ${
-                        user.role === 'admin' ? 'text-[#E1A72C] border-[#E1A72C]/30' : 'text-blue-400 border-blue-400/30'
-                      }`}
+                      className={`bg-[var(--bg-input)] border rounded-lg px-3 py-1.5 text-[13px] disabled:opacity-50 focus:outline-none focus:border-[#E1A72C] transition-all font-medium ${user.role === 'admin' ? 'text-[#E1A72C] border-[#E1A72C]/30' : 'text-blue-400 border-blue-400/30'
+                        }`}
                     >
                       <option value="viewer">Viewer</option>
                       <option value="admin">Admin</option>

@@ -33,9 +33,20 @@ export function ServerCard({ server }: { server: Server }) {
         {/* Header */}
         <div className="px-4 pt-4 pb-3 flex items-start justify-between">
           <StatusBadge status={server.status} size="lg" />
-          {!server.enabled && (
-            <span className="text-[12px] bg-yellow-400/10 text-yellow-400 px-1.5 py-0.5 rounded">Pausado</span>
-          )}
+          <div className="flex items-center gap-1.5">
+            {server.isPublic && (
+              <span className="text-[11px] bg-[#E1A72C]/10 text-[#E1A72C] px-1.5 py-0.5 rounded flex items-center gap-1" title="Visible en página de status">
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.64 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.64 0-8.573-3.007-9.963-7.178z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Status
+              </span>
+            )}
+            {!server.enabled && (
+              <span className="text-[12px] bg-yellow-400/10 text-yellow-400 px-1.5 py-0.5 rounded">Pausado</span>
+            )}
+          </div>
         </div>
 
         {/* Body */}
