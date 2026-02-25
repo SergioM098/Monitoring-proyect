@@ -37,7 +37,6 @@ export function ParticlePlanet() {
 
     // Generate sphere points (Fibonacci sphere)
     const NUM_POINTS = 800;
-    const RADIUS = Math.min(width, height) * 0.38;
     const points: Point[] = [];
     const goldenAngle = Math.PI * (3 - Math.sqrt(5));
 
@@ -62,7 +61,7 @@ export function ParticlePlanet() {
 
     let time = 0;
 
-    const rotateY = (p: Point, angle: number) => {
+    const rotateY = (p: { x: number; y: number; z: number }, angle: number) => {
       const cos = Math.cos(angle);
       const sin = Math.sin(angle);
       return {

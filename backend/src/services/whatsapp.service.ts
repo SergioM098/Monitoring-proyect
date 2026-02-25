@@ -1,10 +1,12 @@
-import { Client, LocalAuth } from 'whatsapp-web.js';
+import pkg from 'whatsapp-web.js';
+const { Client, LocalAuth } = pkg;
+type WAClient = InstanceType<typeof Client>;
 import qrcode from 'qrcode-terminal';
 
-let client: Client | null = null;
+let client: WAClient | null = null;
 let isReady = false;
 
-export function getWhatsAppClient(): Client | null {
+export function getWhatsAppClient(): WAClient | null {
   return isReady ? client : null;
 }
 
@@ -12,7 +14,7 @@ export function isWhatsAppReady(): boolean {
   return isReady;
 }
 
-export function initWhatsApp(): Client {
+export function initWhatsApp(): WAClient {
   client = new Client({
     authStrategy: new LocalAuth({ dataPath: '.wwebjs_auth' }),
     puppeteer: {
@@ -21,7 +23,7 @@ export function initWhatsApp(): Client {
     },
   });
 
-  client.on('qr', (qr) => {
+  client.on('qr', (qr: string) => {
     console.log('\n========================================');
     console.log('  Escanea este QR con WhatsApp:');
     console.log('========================================\n');
@@ -38,17 +40,21 @@ export function initWhatsApp(): Client {
     console.log('[WhatsApp] Sesión autenticada');
   });
 
-  client.on('auth_failure', (msg) => {
+  client.on('auth_failure', (msg: string) => {
     isReady = false;
     console.error('[WhatsApp] Error de autenticación:', msg);
   });
 
-  client.on('disconnected', (reason) => {
+  client.on('disconnected', (reason: string) => {
     isReady = false;
     console.log('[WhatsApp] Desconectado:', reason);
   });
 
-  client.initialize();
+  client.initialize().catch((err: Error) => {
+    console.warn('[WhatsApp] No se pudo inicializar (Chrome no disponible?):', err.message);
+    console.warn('[WhatsApp] Las notificaciones por WhatsApp estarán deshabilitadas.');
+    client = null;
+  });
 
   return client;
 }

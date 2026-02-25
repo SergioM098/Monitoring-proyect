@@ -1,6 +1,7 @@
 {
   "name": "server-monitor-backend",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",

@@ -14,25 +14,36 @@ WORKDIR /app/backend
 COPY backend/package.json backend/package-lock.json* ./
 RUN npm ci
 COPY backend/ ./
-RUN npx prisma generate && npm run build
+RUN DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" npx prisma generate \
+    && npm run build \
+    && cp src/generated/prisma/*.node dist/generated/prisma/ 2>/dev/null || true
+# Prune dev deps for production
+RUN npm prune --omit=dev
 
 # ── Stage 3: Production ─────────────────────────────────────────────────────
 FROM node:20-alpine
 
-RUN apk add --no-cache nginx supervisor
+# Chromium for whatsapp-web.js (Puppeteer)
+RUN apk add --no-cache \
+    nginx supervisor \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont
+
+# Tell Puppeteer to use system Chromium instead of downloading its own
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 WORKDIR /app
 
-# Backend: production deps
-COPY backend/package.json backend/package-lock.json* ./backend/
-RUN cd backend && npm ci --omit=dev
-
-# Backend: compiled JS
+# Backend
+COPY --from=backend-build /app/backend/package.json ./backend/
+COPY --from=backend-build /app/backend/node_modules ./backend/node_modules
 COPY --from=backend-build /app/backend/dist ./backend/dist
-# Backend: prisma schema (for migrate deploy)
 COPY --from=backend-build /app/backend/prisma ./backend/prisma
-# Backend: prisma engine binaries
-COPY --from=backend-build /app/backend/src/generated ./backend/dist/generated
 
 # Frontend: static files
 COPY --from=frontend-build /app/frontend/dist ./frontend/dist
