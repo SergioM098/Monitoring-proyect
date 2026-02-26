@@ -52,7 +52,10 @@ export async function buildApp() {
   // Start scheduler, socket, and WhatsApp after ready
   app.ready().then(() => {
     startScheduler(app);
-    initWhatsApp();
+    initWhatsApp().catch((err) => {
+      app.log.warn(`[WhatsApp] No se pudo inicializar: ${err.message}`);
+      app.log.warn('[WhatsApp] Las notificaciones por WhatsApp estarán deshabilitadas.');
+    });
     io.on('connection', (socket) => {
       app.log.info(`Socket connected: ${socket.id}`);
     });

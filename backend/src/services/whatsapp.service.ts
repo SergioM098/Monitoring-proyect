@@ -1,62 +1,72 @@
-import pkg from 'whatsapp-web.js';
-const { Client, LocalAuth } = pkg;
-type WAClient = InstanceType<typeof Client>;
+import { join } from 'path';
+import makeWASocket, {
+  DisconnectReason,
+  useMultiFileAuthState,
+} from '@whiskeysockets/baileys';
+import { Boom } from '@hapi/boom';
+import pino from 'pino';
 import qrcode from 'qrcode-terminal';
 
-let client: WAClient | null = null;
+type WASocket = ReturnType<typeof makeWASocket>;
+
+const AUTH_DIR = join(process.cwd(), '.baileys_auth');
+
+let sock: WASocket | null = null;
 let isReady = false;
 
-export function getWhatsAppClient(): WAClient | null {
-  return isReady ? client : null;
+export function getWhatsAppClient(): WASocket | null {
+  return isReady ? sock : null;
 }
 
 export function isWhatsAppReady(): boolean {
   return isReady;
 }
 
-export function initWhatsApp(): WAClient {
-  client = new Client({
-    authStrategy: new LocalAuth({ dataPath: '.wwebjs_auth' }),
-    puppeteer: {
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
-    },
-  });
+export async function initWhatsApp(): Promise<void> {
+  // Load auth state ONCE — reused across reconnections
+  const { state, saveCreds } = await useMultiFileAuthState(AUTH_DIR);
 
-  client.on('qr', (qr: string) => {
-    console.log('\n========================================');
-    console.log('  Escanea este QR con WhatsApp:');
-    console.log('========================================\n');
-    qrcode.generate(qr, { small: true });
-    console.log('\nAbre WhatsApp > Dispositivos vinculados > Vincular dispositivo\n');
-  });
+  function connectToWA() {
+    sock = makeWASocket({
+      auth: state,
+      logger: pino({ level: 'silent' }),
+    });
 
-  client.on('ready', () => {
-    isReady = true;
-    console.log('[WhatsApp] Cliente conectado y listo para enviar mensajes');
-  });
+    sock.ev.on('creds.update', saveCreds);
 
-  client.on('authenticated', () => {
-    console.log('[WhatsApp] Sesión autenticada');
-  });
+    sock.ev.on('connection.update', (update) => {
+      const { connection, lastDisconnect, qr } = update;
 
-  client.on('auth_failure', (msg: string) => {
-    isReady = false;
-    console.error('[WhatsApp] Error de autenticación:', msg);
-  });
+      if (qr) {
+        console.log('\n========================================');
+        console.log('  Escanea este QR con WhatsApp:');
+        console.log('========================================\n');
+        qrcode.generate(qr, { small: true });
+        console.log('\nAbre WhatsApp > Dispositivos vinculados > Vincular dispositivo\n');
+      }
 
-  client.on('disconnected', (reason: string) => {
-    isReady = false;
-    console.log('[WhatsApp] Desconectado:', reason);
-  });
+      if (connection === 'open') {
+        isReady = true;
+        console.log('[WhatsApp] Cliente conectado y listo para enviar mensajes');
+      }
 
-  client.initialize().catch((err: Error) => {
-    console.warn('[WhatsApp] No se pudo inicializar (Chrome no disponible?):', err.message);
-    console.warn('[WhatsApp] Las notificaciones por WhatsApp estarán deshabilitadas.');
-    client = null;
-  });
+      if (connection === 'close') {
+        isReady = false;
+        const statusCode = (lastDisconnect?.error as Boom)?.output?.statusCode;
 
-  return client;
+        if (statusCode === DisconnectReason.loggedOut) {
+          console.error('[WhatsApp] Sesión cerrada. Elimina la carpeta .baileys_auth y escanea el QR de nuevo.');
+          sock = null;
+          return;
+        }
+
+        console.log('[WhatsApp] Desconectado, reconectando en 5s...');
+        setTimeout(connectToWA, 5000);
+      }
+    });
+  }
+
+  connectToWA();
 }
 
 /**
@@ -65,15 +75,15 @@ export function initWhatsApp(): WAClient {
  * @param message - The message text
  */
 export async function sendWhatsAppMessage(phone: string, message: string): Promise<void> {
-  if (!client || !isReady) {
+  if (!sock || !isReady) {
     throw new Error('WhatsApp client not ready. Scan the QR code first.');
   }
 
   // Normalize: remove "whatsapp:", "+", spaces, dashes
   const cleaned = phone.replace(/^whatsapp:/, '').replace(/[+\s-]/g, '');
 
-  // whatsapp-web.js uses the format: countrycode + number + @c.us
-  const chatId = `${cleaned}@c.us`;
+  // Baileys uses the format: countrycode + number + @s.whatsapp.net
+  const jid = `${cleaned}@s.whatsapp.net`;
 
-  await client.sendMessage(chatId, message);
+  await sock.sendMessage(jid, { text: message });
 }

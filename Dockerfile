@@ -23,19 +23,8 @@ RUN npm prune --omit=dev
 # ── Stage 3: Production ─────────────────────────────────────────────────────
 FROM node:20-alpine
 
-# Chromium for whatsapp-web.js (Puppeteer)
-RUN apk add --no-cache \
-    nginx supervisor \
-    chromium \
-    nss \
-    freetype \
-    harfbuzz \
-    ca-certificates \
-    ttf-freefont
-
-# Tell Puppeteer to use system Chromium instead of downloading its own
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+# Nginx + Supervisor (Chromium no longer needed — Baileys uses WebSocket)
+RUN apk add --no-cache nginx supervisor
 
 WORKDIR /app
 

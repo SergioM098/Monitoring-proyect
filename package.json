@@ -2,7 +2,8 @@
   "name": "server-monitor",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "kill": "taskkill /F /IM node.exe || true",
+    "dev": "concurrently --kill-others \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:backend": "cd backend && npm run dev",
     "dev:frontend": "cd frontend && npm run dev",
     "build": "cd backend && npm run build && cd ../frontend && npm run build",

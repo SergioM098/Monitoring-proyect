@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(echo:*)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(timeout 10 npx tsx:*)",
+      "Bash(taskkill:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)"
     ]
   }
 }
