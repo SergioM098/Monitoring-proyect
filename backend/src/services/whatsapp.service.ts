@@ -1,11 +1,11 @@
 import { join } from 'path';
 import makeWASocket, {
   DisconnectReason,
+  fetchLatestWaWebVersion,
   useMultiFileAuthState,
 } from '@whiskeysockets/baileys';
 import { Boom } from '@hapi/boom';
 import pino from 'pino';
-import qrcode from 'qrcode-terminal';
 
 type WASocket = ReturnType<typeof makeWASocket>;
 
@@ -23,30 +23,60 @@ export function isWhatsAppReady(): boolean {
 }
 
 export async function initWhatsApp(): Promise<void> {
-  // Load auth state ONCE — reused across reconnections
   const { state, saveCreds } = await useMultiFileAuthState(AUTH_DIR);
+
+  // Fetch latest WhatsApp Web version so we don't get rejected for outdated protocol
+  let waVersion: [number, number, number] | undefined;
+  try {
+    const { version } = await fetchLatestWaWebVersion({});
+    waVersion = version as [number, number, number];
+    console.log(`[WhatsApp] Usando version WA Web: ${waVersion.join('.')}`);
+  } catch {
+    console.log('[WhatsApp] No se pudo obtener version, usando default');
+  }
+
+  let pairingRequested = false;
 
   function connectToWA() {
     sock = makeWASocket({
       auth: state,
+      version: waVersion,
+      browser: ['WOW Monitor', 'Chrome', '131.0.0'],
       logger: pino({ level: 'silent' }),
     });
 
     sock.ev.on('creds.update', saveCreds);
 
-    sock.ev.on('connection.update', (update) => {
+    sock.ev.on('connection.update', async (update) => {
       const { connection, lastDisconnect, qr } = update;
 
-      if (qr) {
-        console.log('\n========================================');
-        console.log('  Escanea este QR con WhatsApp:');
-        console.log('========================================\n');
-        qrcode.generate(qr, { small: true });
-        console.log('\nAbre WhatsApp > Dispositivos vinculados > Vincular dispositivo\n');
+      // When we get a QR, use pairing code instead (bypasses QR rate-limit)
+      if (qr && !pairingRequested) {
+        pairingRequested = true;
+        const phone = process.env.WHATSAPP_PHONE;
+        if (!phone) {
+          console.error('[WhatsApp] No se encontro WHATSAPP_PHONE en .env');
+          console.error('[WhatsApp] Agrega WHATSAPP_PHONE=521234567890 a tu archivo .env');
+          return;
+        }
+        try {
+          const code = await sock!.requestPairingCode(phone);
+          console.log('\n========================================');
+          console.log('  Codigo de vinculacion WhatsApp:');
+          console.log(`  >>> ${code} <<<`);
+          console.log('========================================');
+          console.log('\nAbre WhatsApp > Dispositivos vinculados');
+          console.log('> Vincular dispositivo > Vincular con numero de telefono');
+          console.log(`> Ingresa el codigo: ${code}\n`);
+        } catch (err: unknown) {
+          const e = err as { message?: string };
+          console.error('[WhatsApp] Error solicitando pairing code:', e.message);
+        }
       }
 
       if (connection === 'open') {
         isReady = true;
+        pairingRequested = false;
         console.log('[WhatsApp] Cliente conectado y listo para enviar mensajes');
       }
 
@@ -55,11 +85,12 @@ export async function initWhatsApp(): Promise<void> {
         const statusCode = (lastDisconnect?.error as Boom)?.output?.statusCode;
 
         if (statusCode === DisconnectReason.loggedOut) {
-          console.error('[WhatsApp] Sesión cerrada. Elimina la carpeta .baileys_auth y escanea el QR de nuevo.');
+          console.error('[WhatsApp] Sesion cerrada. Elimina la carpeta .baileys_auth y reinicia.');
           sock = null;
           return;
         }
 
+        pairingRequested = false;
         console.log('[WhatsApp] Desconectado, reconectando en 5s...');
         setTimeout(connectToWA, 5000);
       }
@@ -79,10 +110,7 @@ export async function sendWhatsAppMessage(phone: string, message: string): Promi
     throw new Error('WhatsApp client not ready. Scan the QR code first.');
   }
 
-  // Normalize: remove "whatsapp:", "+", spaces, dashes
   const cleaned = phone.replace(/^whatsapp:/, '').replace(/[+\s-]/g, '');
-
-  // Baileys uses the format: countrycode + number + @s.whatsapp.net
   const jid = `${cleaned}@s.whatsapp.net`;
 
   await sock.sendMessage(jid, { text: message });

@@ -4,25 +4,25 @@ import { authenticate, requireAdmin } from '../hooks/auth.js';
 export async function registerNotificationRoutes(app: FastifyInstance) {
   app.addHook('preHandler', authenticate);
 
-  // GET /api/notifications/:serverId
-  app.get('/:serverId', async (request) => {
-    const { serverId } = request.params as { serverId: string };
-    return app.prisma.notification.findMany({ where: { serverId } });
+  // GET /api/notifications — all global notifications (serverId is null)
+  app.get('/', async () => {
+    return app.prisma.notification.findMany({
+      where: { serverId: null },
+      orderBy: { createdAt: 'desc' },
+    });
   });
 
   // POST /api/notifications (admin only)
   app.post('/', { preHandler: requireAdmin }, async (request, reply) => {
     const body = request.body as {
-      serverId: string;
       destination: string;
       type?: string;
       triggerOn?: string;
     };
     const notif = await app.prisma.notification.create({
       data: {
-        serverId: body.serverId,
         destination: body.destination,
-        type: body.type || 'whatsapp',
+        type: body.type || 'email',
         triggerOn: body.triggerOn || 'down',
       },
     });

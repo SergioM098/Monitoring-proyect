@@ -34,7 +34,7 @@ export interface Check {
 
 export interface NotificationSetting {
   id: string;
-  serverId: string;
+  serverId?: string | null;
   type: string;
   destination: string;
   triggerOn: string;

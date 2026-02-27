@@ -11,7 +11,7 @@ import { registerIncidentRoutes } from './routes/incidents.js';
 import { registerReportRoutes } from './routes/reports.js';
 import { registerStatusRoutes } from './routes/status.js';
 import { startScheduler } from './services/scheduler.service.js';
-import { initWhatsApp, isWhatsAppReady } from './services/whatsapp.service.js';
+import { initEmail, isEmailReady } from './services/email.service.js';
 
 export async function buildApp() {
   const app = Fastify({ logger: true });
@@ -40,22 +40,19 @@ export async function buildApp() {
   await app.register(registerReportRoutes, { prefix: '/api/reports' });
   await app.register(registerStatusRoutes, { prefix: '/api/status' });
 
-  // Health check + WhatsApp status
+  // Health check
   app.get('/api/health', async () => {
     return {
       status: 'ok',
-      whatsapp: isWhatsAppReady() ? 'connected' : 'disconnected',
+      email: isEmailReady() ? 'connected' : 'disconnected',
       timestamp: new Date().toISOString(),
     };
   });
 
-  // Start scheduler, socket, and WhatsApp after ready
+  // Start scheduler, socket, and email after ready
   app.ready().then(() => {
     startScheduler(app);
-    initWhatsApp().catch((err) => {
-      app.log.warn(`[WhatsApp] No se pudo inicializar: ${err.message}`);
-      app.log.warn('[WhatsApp] Las notificaciones por WhatsApp estarán deshabilitadas.');
-    });
+    initEmail();
     io.on('connection', (socket) => {
       app.log.info(`Socket connected: ${socket.id}`);
     });

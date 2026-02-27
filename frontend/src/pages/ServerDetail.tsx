@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { StatusBadge } from '../components/servers/StatusBadge';
 import { ResponseTimeChart } from '../components/checks/ResponseTimeChart';
 import api, { downloadCsv } from '../api/client';
-import type { Server, NotificationSetting, Check } from '../types';
+import type { Server, Check } from '../types';
 
 const PAGE_SIZE = 15;
 
@@ -20,9 +20,6 @@ export function ServerDetail() {
   const { checks: chartChecks, loading: checksLoading } = useCheckHistory(id!);
   const { isAdmin } = useAuth();
   const [server, setServer] = useState<Server | null>(null);
-  const [notifications, setNotifications] = useState<NotificationSetting[]>([]);
-  const [newDest, setNewDest] = useState('');
-  const [newTrigger, setNewTrigger] = useState('down');
 
   const [page, setPage] = useState(0);
   const [pageChecks, setPageChecks] = useState<Check[]>([]);
@@ -46,20 +43,7 @@ export function ServerDetail() {
 
   useEffect(() => {
     api.get(`/servers/${id}`).then(({ data }) => setServer(data));
-    api.get(`/notifications/${id}`).then(({ data }) => setNotifications(data));
   }, [id]);
-
-  const addNotification = async () => {
-    if (!newDest) return;
-    const { data } = await api.post('/notifications', { serverId: id, destination: newDest, triggerOn: newTrigger });
-    setNotifications((prev) => [...prev, data]);
-    setNewDest('');
-  };
-
-  const removeNotification = async (nid: string) => {
-    await api.delete(`/notifications/${nid}`);
-    setNotifications((prev) => prev.filter((n) => n.id !== nid));
-  };
 
   if (!server) {
     return (
@@ -139,68 +123,6 @@ export function ServerDetail() {
           )}
         </div>
       </div>
-
-      {/* Notification settings (admin only) */}
-      {isAdmin && (
-        <div className="card-static mb-4 overflow-hidden">
-          <div className="px-4 py-3 border-b flex items-center gap-2" style={{ borderColor: 'var(--border)' }}>
-            <svg className="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 9.75a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 01.778-.332 48.294 48.294 0 005.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
-            </svg>
-            <h2 className="text-[15px] font-medium" style={{ color: 'var(--text-primary)' }}>Alertas WhatsApp</h2>
-          </div>
-          <div className="p-4">
-            <div className="space-y-2 mb-3">
-              {notifications.map((n) => (
-                <div key={n.id} className="flex items-center justify-between border rounded-lg px-3 py-2.5 transition-colors" style={{ background: 'var(--bg-input)', borderColor: 'var(--border)' }}>
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-green-400 glow-green" />
-                    <span className="text-[14px] font-mono" style={{ color: 'var(--text-primary)' }}>{n.destination}</span>
-                    <span className="ml-1 text-[12px] px-1.5 py-0.5 rounded" style={{ color: 'var(--text-muted)', background: 'var(--bg-card)' }}>
-                      {n.triggerOn === 'both' ? 'Caido + Lento' : n.triggerOn === 'degraded' ? 'Solo lento' : 'Solo caido'}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => removeNotification(n.id)}
-                    className="text-[13px] text-red-400/70 hover:text-red-400 transition-colors"
-                  >
-                    Eliminar
-                  </button>
-                </div>
-              ))}
-              {notifications.length === 0 && (
-                <p className="text-[14px] py-2" style={{ color: 'var(--text-muted)' }}>Sin alertas configuradas</p>
-              )}
-            </div>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={newDest}
-                onChange={(e) => setNewDest(e.target.value)}
-                placeholder="521234567890"
-                className="flex-1 border rounded-lg px-3 py-1.5 text-[14px] focus:outline-none focus:border-[#E1A72C] transition-all"
-                style={{ background: 'var(--bg-input)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
-              />
-              <select
-                value={newTrigger}
-                onChange={(e) => setNewTrigger(e.target.value)}
-                className="border rounded-lg px-2 py-1.5 text-[14px] focus:outline-none focus:border-[#E1A72C] transition-all"
-                style={{ background: 'var(--bg-input)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
-              >
-                <option value="down">Solo caido</option>
-                <option value="degraded">Solo lento</option>
-                <option value="both">Ambos</option>
-              </select>
-              <button
-                onClick={addNotification}
-                className="px-3 py-1.5 bg-gradient-to-r from-[#E1A72C] to-[#C98B1E] hover:from-[#C98B1E] hover:to-[#B07819] text-white text-[14px] font-medium rounded-lg transition-all shadow-sm shadow-[#E1A72C]/15"
-              >
-                Agregar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Check history table */}
       <div className="card-static overflow-hidden">

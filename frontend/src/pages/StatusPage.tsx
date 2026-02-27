@@ -198,33 +198,6 @@ export function StatusPage() {
                     </span>
                   </div>
 
-                  {/* Stats row */}
-                  <div className="flex items-center gap-4">
-                    {/* Uptime */}
-                    <div className="flex-1">
-                      <div className="text-[12px] mb-1.5" style={{ color: 'var(--text-muted)' }}>Disponibilidad 30d</div>
-                      <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--bg-input)' }}>
-                        <div
-                          className="h-full rounded-full transition-all duration-1000"
-                          style={{
-                            width: `${server.uptimePercent}%`,
-                            background: `linear-gradient(to right, ${color}90, ${color})`,
-                            boxShadow: `0 0 8px ${color}40`,
-                          }}
-                        />
-                      </div>
-                      <div className="text-[13px] font-mono mt-1" style={{ color }}>{server.uptimePercent}%</div>
-                    </div>
-
-                    {/* Response time */}
-                    {server.avgResponseMs !== null && (
-                      <div className="text-right shrink-0">
-                        <div className="text-[12px] mb-1" style={{ color: 'var(--text-muted)' }}>Respuesta</div>
-                        <div className="text-[18px] font-bold font-mono" style={{ color: 'var(--text-primary)' }}>{server.avgResponseMs}<span className="text-[12px] font-normal ml-0.5" style={{ color: 'var(--text-muted)' }}>ms</span></div>
-                      </div>
-                    )}
-                  </div>
-
                   {/* Active incident */}
                   {server.activeIncident && (
                     <div className="mt-4 bg-red-400/8 border border-red-400/15 rounded-lg px-4 py-3">
