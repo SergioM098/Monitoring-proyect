@@ -16,6 +16,7 @@ export interface Server {
   status: string;
   enabled: boolean;
   isPublic: boolean;
+  publicSlug?: string | null;
   createdById?: string;
   createdBy?: { id: string; name: string };
   createdAt: string;

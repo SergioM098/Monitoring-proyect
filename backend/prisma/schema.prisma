@@ -32,6 +32,7 @@ model Server {
   status             String   @default("unknown")
   enabled            Boolean  @default(true)
   isPublic           Boolean  @default(false)
+  publicSlug         String?  @unique
   createdById        String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt

@@ -92,16 +92,34 @@ export function ServerDetail() {
               </div>
             </div>
             {isAdmin && (
-              <Link
-                to={`/servers/${id}/edit`}
-                className="px-4 py-2 text-[14px] font-medium rounded-lg transition-all flex items-center gap-2"
-                style={{ background: 'var(--border)', color: 'var(--text-primary)' }}
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                </svg>
-                Editar
-              </Link>
+              <div className="flex items-center gap-2">
+                {server.isPublic && server.publicSlug && (
+                  <button
+                    onClick={() => {
+                      const url = `${window.location.origin}/status/${server.publicSlug}`;
+                      navigator.clipboard.writeText(url);
+                    }}
+                    className="px-4 py-2 text-[14px] font-medium rounded-lg transition-all flex items-center gap-2 hover:opacity-80"
+                    style={{ background: 'var(--border)', color: 'var(--text-primary)' }}
+                    title="Copiar enlace publico"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m9.86-2.07a4.5 4.5 0 00-1.242-7.244l-4.5-4.5a4.5 4.5 0 00-6.364 6.364L4.34 8.374" />
+                    </svg>
+                    Copiar enlace
+                  </button>
+                )}
+                <Link
+                  to={`/servers/${id}/edit`}
+                  className="px-4 py-2 text-[14px] font-medium rounded-lg transition-all flex items-center gap-2"
+                  style={{ background: 'var(--border)', color: 'var(--text-primary)' }}
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                  </svg>
+                  Editar
+                </Link>
+              </div>
             )}
           </div>
         </div>

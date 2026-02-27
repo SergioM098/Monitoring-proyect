@@ -12,6 +12,7 @@ import { Settings } from './pages/Settings';
 import { UserManagement } from './pages/UserManagement';
 import { Incidents } from './pages/Incidents';
 import { StatusPage } from './pages/StatusPage';
+import { ServerStatusPage } from './pages/ServerStatusPage';
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/status" element={<StatusPage />} />
+            <Route path="/status/:slug" element={<ServerStatusPage />} />
             <Route
               path="/"
               element={

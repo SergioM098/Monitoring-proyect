@@ -1,6 +1,14 @@
 import type { FastifyInstance } from 'fastify';
 import { authenticate, requireAdmin } from '../hooks/auth.js';
 
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // remove accents
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 export async function registerServerRoutes(app: FastifyInstance) {
   // All server routes require authentication
   app.addHook('preHandler', authenticate);
@@ -48,6 +56,7 @@ export async function registerServerRoutes(app: FastifyInstance) {
         intervalSec: body.intervalSec || 60,
         degradedThresholdMs: body.degradedThresholdMs ?? 5000,
         isPublic: body.isPublic ?? false,
+        publicSlug: body.isPublic ? slugify(body.name) : null,
         createdById: request.user!.id,
       },
     });
@@ -67,6 +76,24 @@ export async function registerServerRoutes(app: FastifyInstance) {
       isPublic: boolean;
       enabled: boolean;
     }>;
+
+    // Auto-generate slug from name when making server public
+    if (body.isPublic === true) {
+      const existing = await app.prisma.server.findUnique({ where: { id }, select: { publicSlug: true, name: true } });
+      if (!existing?.publicSlug) {
+        const name = body.name || existing?.name || id;
+        (body as Record<string, unknown>).publicSlug = slugify(name);
+      }
+    }
+
+    // Update slug if name changes and server is public
+    if (body.name) {
+      const existing = await app.prisma.server.findUnique({ where: { id }, select: { isPublic: true } });
+      if (existing?.isPublic || body.isPublic === true) {
+        (body as Record<string, unknown>).publicSlug = slugify(body.name);
+      }
+    }
+
     const server = await app.prisma.server.update({ where: { id }, data: body });
     app.io.emit('server:updated', server);
     return server;
