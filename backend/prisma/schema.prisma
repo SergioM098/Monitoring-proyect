@@ -63,7 +63,7 @@ model Check {
 model Notification {
   id          String   @id @default(uuid())
   serverId    String?
-  type        String   @default("whatsapp")
+  type        String   @default("email")
   destination String
   triggerOn   String   @default("down") // "down" | "degraded" | "both"
   enabled     Boolean  @default(true)

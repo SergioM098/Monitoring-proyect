@@ -51,7 +51,7 @@ CREATE INDEX "checks_serverId_checkedAt_idx" ON "checks"("serverId", "checkedAt"
 CREATE TABLE "notifications" (
     "id" TEXT NOT NULL DEFAULT gen_random_uuid(),
     "serverId" TEXT NOT NULL,
-    "type" TEXT NOT NULL DEFAULT 'whatsapp',
+    "type" TEXT NOT NULL DEFAULT 'email',
     "destination" TEXT NOT NULL,
     "triggerOn" TEXT NOT NULL DEFAULT 'down',
     "enabled" BOOLEAN NOT NULL DEFAULT true,
