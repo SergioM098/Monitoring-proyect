@@ -10,6 +10,8 @@ import { registerUserRoutes } from './routes/users.js';
 import { registerIncidentRoutes } from './routes/incidents.js';
 import { registerReportRoutes } from './routes/reports.js';
 import { registerStatusRoutes } from './routes/status.js';
+import { registerApiKeyRoutes } from './routes/apikeys.js';
+import { registerExternalRoutes } from './routes/external.js';
 import { startScheduler } from './services/scheduler.service.js';
 import { initEmail, isEmailReady } from './services/email.service.js';
 
@@ -39,6 +41,8 @@ export async function buildApp() {
   await app.register(registerIncidentRoutes, { prefix: '/api/incidents' });
   await app.register(registerReportRoutes, { prefix: '/api/reports' });
   await app.register(registerStatusRoutes, { prefix: '/api/status' });
+  await app.register(registerApiKeyRoutes, { prefix: '/api/apikeys' });
+  await app.register(registerExternalRoutes);
 
   // Health check
   app.get('/api/health', async () => {
