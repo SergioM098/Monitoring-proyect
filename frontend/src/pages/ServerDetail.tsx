@@ -74,16 +74,16 @@ export function ServerDetail() {
       <div className="card-static overflow-hidden mb-4">
         <div className="h-[3px]" style={{ background: `linear-gradient(to right, ${accentColor}, ${accentColor}40)` }} />
         <div className="p-5">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-4">
               <StatusBadge status={server.status} size="lg" />
               <div>
-                <h1 className="text-[22px] font-semibold" style={{ color: 'var(--text-primary)' }}>{server.name}</h1>
-                <div className="flex items-center gap-3 mt-1">
+                <h1 className="text-[18px] sm:text-[22px] font-semibold" style={{ color: 'var(--text-primary)' }}>{server.name}</h1>
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1">
                   <span className="text-[12px] px-2 py-0.5 rounded uppercase font-medium" style={{ color: 'var(--text-secondary)', background: 'var(--bg-input)' }}>
                     {server.checkType}
                   </span>
-                  <span className="text-[14px]" style={{ color: 'var(--text-secondary)' }}>{server.url}</span>
+                  <span className="text-[13px] sm:text-[14px] truncate max-w-[180px] sm:max-w-none" style={{ color: 'var(--text-secondary)' }}>{server.url}</span>
                   <span className="text-[13px]" style={{ color: 'var(--text-muted)' }}>cada {server.intervalSec}s</span>
                   {!server.enabled && (
                     <span className="text-[12px] bg-yellow-400/10 text-yellow-400 px-2 py-0.5 rounded">Pausado</span>
@@ -99,19 +99,19 @@ export function ServerDetail() {
                       const url = `${window.location.origin}/status/${server.publicSlug}`;
                       navigator.clipboard.writeText(url);
                     }}
-                    className="px-4 py-2 text-[14px] font-medium rounded-lg transition-all flex items-center gap-2 hover:opacity-80"
+                    className="px-3 sm:px-4 py-2 text-[13px] sm:text-[14px] font-medium rounded-lg transition-all flex items-center gap-2 hover:opacity-80"
                     style={{ background: 'var(--border)', color: 'var(--text-primary)' }}
                     title="Copiar enlace publico"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m9.86-2.07a4.5 4.5 0 00-1.242-7.244l-4.5-4.5a4.5 4.5 0 00-6.364 6.364L4.34 8.374" />
                     </svg>
-                    Copiar enlace
+                    <span className="hidden sm:inline">Copiar enlace</span>
                   </button>
                 )}
                 <Link
                   to={`/servers/${id}/edit`}
-                  className="px-4 py-2 text-[14px] font-medium rounded-lg transition-all flex items-center gap-2"
+                  className="px-3 sm:px-4 py-2 text-[13px] sm:text-[14px] font-medium rounded-lg transition-all flex items-center gap-2"
                   style={{ background: 'var(--border)', color: 'var(--text-primary)' }}
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -200,15 +200,15 @@ export function ServerDetail() {
         </div>
 
         {totalChecks > PAGE_SIZE && (
-          <div className="flex items-center justify-between px-4 py-3 border-t" style={{ borderColor: 'var(--border)', background: 'var(--bg-table-header)' }}>
+          <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-3 gap-2 border-t" style={{ borderColor: 'var(--border)', background: 'var(--bg-table-header)' }}>
             <span className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
               {page * PAGE_SIZE + 1}-{Math.min((page + 1) * PAGE_SIZE, totalChecks)} de {totalChecks}
             </span>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 flex-wrap justify-center">
               <button
                 onClick={() => setPage(0)}
                 disabled={page === 0}
-                className="px-2.5 py-1.5 text-[13px] rounded-md disabled:cursor-not-allowed transition-all" style={{ color: 'var(--text-secondary)' }}
+                className="hidden sm:inline px-2.5 py-1.5 text-[13px] rounded-md disabled:cursor-not-allowed transition-all" style={{ color: 'var(--text-secondary)' }}
               >
                 Primera
               </button>
@@ -232,7 +232,7 @@ export function ServerDetail() {
               <button
                 onClick={() => setPage(totalPages - 1)}
                 disabled={page >= totalPages - 1}
-                className="px-2.5 py-1.5 text-[13px] rounded-md disabled:cursor-not-allowed transition-all" style={{ color: 'var(--text-secondary)' }}
+                className="hidden sm:inline px-2.5 py-1.5 text-[13px] rounded-md disabled:cursor-not-allowed transition-all" style={{ color: 'var(--text-secondary)' }}
               >
                 Ultima
               </button>

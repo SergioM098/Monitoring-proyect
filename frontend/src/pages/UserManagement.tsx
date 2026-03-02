@@ -51,9 +51,9 @@ export function UserManagement() {
   return (
     <div className="animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#E1A72C]/20 to-[#E1A72C]/5 border border-[#E1A72C]/20 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#E1A72C]/20 to-[#E1A72C]/5 border border-[#E1A72C]/20 flex items-center justify-center shrink-0">
             <svg className="w-5 h-5 text-[#E1A72C]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
             </svg>
@@ -65,7 +65,7 @@ export function UserManagement() {
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="px-4 py-2.5 bg-gradient-to-r from-[#E1A72C] to-[#C98B1E] hover:from-[#C98B1E] hover:to-[#B07819] text-white text-[14px] font-medium rounded-lg transition-all shadow-md shadow-[#E1A72C]/20 hover:shadow-lg hover:shadow-[#E1A72C]/30 flex items-center gap-2"
+          className="px-4 py-2.5 bg-gradient-to-r from-[#E1A72C] to-[#C98B1E] hover:from-[#C98B1E] hover:to-[#B07819] text-white text-[14px] font-medium rounded-lg transition-all shadow-md shadow-[#E1A72C]/20 hover:shadow-lg hover:shadow-[#E1A72C]/30 flex items-center gap-2 self-start sm:self-auto"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
@@ -75,7 +75,7 @@ export function UserManagement() {
       </div>
 
       {/* Summary cards */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <div className="card-static p-4 animate-fade-in stagger-1">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-[#E1A72C]/10 flex items-center justify-center">
@@ -136,7 +136,7 @@ export function UserManagement() {
                 {error}
               </div>
             )}
-            <form onSubmit={handleCreate} className="grid grid-cols-2 gap-4">
+            <form onSubmit={handleCreate} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-[12px] font-medium mb-1.5 uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Nombre</label>
                 <input type="text" placeholder="Nombre completo" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputClass + ' w-full'} required />
@@ -156,7 +156,7 @@ export function UserManagement() {
                   <option value="admin">Admin</option>
                 </select>
               </div>
-              <div className="col-span-2 flex justify-end gap-2 pt-1">
+              <div className="sm:col-span-2 flex justify-end gap-2 pt-1">
                 <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 text-[14px] rounded-lg transition-all border" style={{ color: 'var(--text-secondary)', borderColor: 'var(--border)' }}>
                   Cancelar
                 </button>
@@ -196,7 +196,7 @@ export function UserManagement() {
             {users.map((user) => {
               const isSelf = user.id === currentUser?.id;
               return (
-                <div key={user.id} className="px-5 py-4 flex items-center gap-4 table-row-hover transition-colors">
+                <div key={user.id} className="px-4 sm:px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 table-row-hover transition-colors">
                   {/* Avatar */}
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center text-[15px] font-bold uppercase shrink-0 ${user.role === 'admin'
                       ? 'bg-gradient-to-br from-[#E1A72C]/20 to-[#E1A72C]/5 text-[#E1A72C] border border-[#E1A72C]/20'

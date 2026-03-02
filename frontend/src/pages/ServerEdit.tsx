@@ -146,7 +146,7 @@ export function ServerEdit() {
 
             <div>
               <label className="block text-[13px] font-medium mb-1.5 uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Tipo de check</label>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 {checkTypes.map((t) => (
                   <button
                     key={t.value}
@@ -183,7 +183,7 @@ export function ServerEdit() {
             <span className="text-[15px] font-medium" style={{ color: 'var(--text-primary)' }}>Configuracion de monitoreo</span>
           </div>
           <div className="p-5 space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-[13px] font-medium mb-1.5 uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Intervalo (segundos)</label>
                 <input type="number" value={intervalSec} onChange={(e) => setIntervalSec(Number(e.target.value))} min={10} max={3600} className={inputClass} />
@@ -214,11 +214,11 @@ export function ServerEdit() {
         </div>
 
         {/* Actions */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <button
             type="button"
             onClick={handleDelete}
-            className="text-[14px] text-red-400/70 hover:text-red-400 transition-colors flex items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-red-400/5"
+            className="text-[14px] text-red-400/70 hover:text-red-400 transition-colors flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-lg hover:bg-red-400/5"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
@@ -226,7 +226,7 @@ export function ServerEdit() {
             Eliminar servidor
           </button>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 justify-end">
             <Link
               to={`/servers/${id}`}
               className="px-4 py-2.5 text-[14px] rounded-lg transition-all border"

@@ -31,7 +31,12 @@ const navIcons: Record<string, ReactNode> = {
   ),
 };
 
-export function Sidebar() {
+interface SidebarProps {
+  mobileOpen: boolean;
+  onClose: () => void;
+}
+
+export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
   const { user, isAdmin, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
@@ -52,12 +57,21 @@ export function Sidebar() {
   ];
 
   return (
-    <aside className="fixed top-0 left-0 h-screen w-56 bg-gradient-to-b from-[#232f3e] to-[#1a2536] border-r border-[#2a3f54] shadow-xl shadow-black/30 flex flex-col z-30">
+    <aside className={`fixed top-0 left-0 h-screen w-56 bg-gradient-to-b from-[#232f3e] to-[#1a2536] border-r border-[#2a3f54] shadow-xl shadow-black/30 flex flex-col z-50 transition-transform duration-300 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
       {/* Logo */}
-      <div className="px-4 py-5 border-b border-[#2a3f54]/60">
-        <Link to="/" className="flex items-center justify-center">
+      <div className="px-4 py-5 border-b border-[#2a3f54]/60 flex items-center justify-between">
+        <Link to="/" className="flex items-center justify-center flex-1" onClick={onClose}>
           <img src="/logo.svg" alt="WOW Desarrollo Digital" className="h-14" />
         </Link>
+        <button
+          onClick={onClose}
+          className="lg:hidden text-[#879ab8] hover:text-white p-1 -mr-1"
+          aria-label="Cerrar menu"
+        >
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
 
       {/* Navigation */}
@@ -66,6 +80,7 @@ export function Sidebar() {
           <Link
             key={item.path}
             to={item.path}
+            onClick={onClose}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[14px] font-medium transition-all ${
               isActive(item.path)
                 ? 'bg-[#E1A72C]/10 text-white border-l-[3px] border-[#E1A72C] -ml-px'

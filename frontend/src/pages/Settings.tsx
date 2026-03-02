@@ -76,8 +76,8 @@ export function Settings() {
           </p>
           <div className="space-y-2 mb-3">
             {notifications.map((n) => (
-              <div key={n.id} className="flex items-center justify-between border rounded-lg px-3 py-2.5 transition-colors" style={{ background: 'var(--bg-input)', borderColor: 'var(--border)' }}>
-                <div className="flex items-center gap-2">
+              <div key={n.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border rounded-lg px-3 py-2.5 transition-colors" style={{ background: 'var(--bg-input)', borderColor: 'var(--border)' }}>
+                <div className="flex items-center gap-2 min-w-0">
                   <span className="w-2 h-2 rounded-full bg-green-400 glow-green" />
                   <span className="text-[14px]" style={{ color: 'var(--text-primary)' }}>{n.destination}</span>
                   <span className="ml-1 text-[12px] px-1.5 py-0.5 rounded" style={{ color: 'var(--text-muted)', background: 'var(--bg-card)' }}>
@@ -96,31 +96,33 @@ export function Settings() {
               <p className="text-[14px] py-2" style={{ color: 'var(--text-muted)' }}>Sin alertas configuradas</p>
             )}
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <input
               type="email"
               value={newDest}
               onChange={(e) => setNewDest(e.target.value)}
               placeholder="nombre@empresa.com"
-              className="flex-1 border rounded-lg px-3 py-1.5 text-[14px] focus:outline-none focus:border-[#E1A72C] transition-all"
+              className="flex-1 border rounded-lg px-3 py-2 sm:py-1.5 text-[14px] focus:outline-none focus:border-[#E1A72C] transition-all"
               style={{ background: 'var(--bg-input)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
             />
-            <select
-              value={newTrigger}
-              onChange={(e) => setNewTrigger(e.target.value)}
-              className="border rounded-lg px-2 py-1.5 text-[14px] focus:outline-none focus:border-[#E1A72C] transition-all"
-              style={{ background: 'var(--bg-input)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
-            >
-              <option value="down">Solo caido</option>
-              <option value="degraded">Solo lento</option>
-              <option value="both">Ambos</option>
-            </select>
-            <button
-              onClick={addNotification}
-              className="px-3 py-1.5 bg-gradient-to-r from-[#E1A72C] to-[#C98B1E] hover:from-[#C98B1E] hover:to-[#B07819] text-white text-[14px] font-medium rounded-lg transition-all shadow-sm shadow-[#E1A72C]/15"
-            >
-              Agregar
-            </button>
+            <div className="flex gap-2">
+              <select
+                value={newTrigger}
+                onChange={(e) => setNewTrigger(e.target.value)}
+                className="flex-1 sm:flex-none border rounded-lg px-2 py-2 sm:py-1.5 text-[14px] focus:outline-none focus:border-[#E1A72C] transition-all"
+                style={{ background: 'var(--bg-input)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+              >
+                <option value="down">Solo caido</option>
+                <option value="degraded">Solo lento</option>
+                <option value="both">Ambos</option>
+              </select>
+              <button
+                onClick={addNotification}
+                className="px-3 py-2 sm:py-1.5 bg-gradient-to-r from-[#E1A72C] to-[#C98B1E] hover:from-[#C98B1E] hover:to-[#B07819] text-white text-[14px] font-medium rounded-lg transition-all shadow-sm shadow-[#E1A72C]/15"
+              >
+                Agregar
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -83,9 +83,9 @@ export function Incidents() {
   return (
     <div className="animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#E1A72C]/20 to-[#E1A72C]/5 border border-[#E1A72C]/20 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#E1A72C]/20 to-[#E1A72C]/5 border border-[#E1A72C]/20 flex items-center justify-center shrink-0">
             <svg className="w-5 h-5 text-[#E1A72C]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
             </svg>
@@ -97,8 +97,8 @@ export function Incidents() {
         </div>
         <button
           onClick={exportCsv}
-          className="px-4 py-2.5 text-[14px] font-medium rounded-lg transition-all flex items-center gap-2 border hover:border-[#E1A72C]/40"
-          style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
+          className="px-4 py-2.5 text-[14px] font-medium rounded-lg transition-all flex items-center gap-2 border border-[#E1A72C]/30 hover:border-[#E1A72C]/60 text-[#E1A72C] hover:bg-[#E1A72C]/5 self-start sm:self-auto"
+          style={{ background: 'var(--bg-card)' }}
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
@@ -108,7 +108,7 @@ export function Incidents() {
       </div>
 
       {/* Summary cards */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <div className="card-static p-4 animate-fade-in stagger-1">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-red-400/10 flex items-center justify-center">
@@ -151,11 +151,11 @@ export function Incidents() {
       </div>
 
       {/* Per-server stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+      <div className="flex gap-3 mb-6 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
         {stats.map((s, i) => (
           <div
             key={s.serverId}
-            className={`card-static overflow-hidden animate-fade-in stagger-${Math.min(i + 1, 8)}`}
+            className={`card-static overflow-hidden animate-fade-in stagger-${Math.min(i + 1, 8)} min-w-[220px] sm:min-w-[240px] flex-shrink-0 sm:flex-shrink sm:flex-1`}
           >
             <div className="p-4">
               <div className="flex items-center justify-between mb-2">
@@ -287,7 +287,7 @@ export function Incidents() {
               return (
                 <div
                   key={inc.id}
-                  className="px-5 py-4 flex items-center gap-4 table-row-hover transition-colors"
+                  className="px-4 sm:px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 table-row-hover transition-colors"
                   style={isActive ? { borderLeft: '3px solid #f87171' } : {}}
                 >
                   {/* Status icon */}
@@ -325,7 +325,7 @@ export function Incidents() {
                   </div>
 
                   {/* Duration */}
-                  <div className="text-right shrink-0">
+                  <div className="sm:text-right shrink-0 flex sm:block items-center gap-2">
                     <div className={`text-[14px] font-mono font-medium ${isActive ? 'text-red-400' : ''}`} style={isActive ? {} : { color: 'var(--text-primary)' }}>
                       {formatDuration(duration)}
                     </div>
