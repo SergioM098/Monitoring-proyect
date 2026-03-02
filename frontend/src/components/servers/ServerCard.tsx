@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { StatusBadge } from './StatusBadge';
 import { ServerForm } from './ServerForm';
@@ -16,10 +17,17 @@ const statusColors: Record<string, string> = {
 export function ServerCard({ server }: { server: Server }) {
   const { isAdmin } = useAuth();
   const [editing, setEditing] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const handleDelete = async () => {
-    if (!confirm(`Eliminar servidor "${server.name}"?`)) return;
-    await api.delete(`/servers/${server.id}`);
+    setDeleting(true);
+    try {
+      await api.delete(`/servers/${server.id}`);
+      setShowDeleteModal(false);
+    } catch {
+      setDeleting(false);
+    }
   };
 
   const topColor = statusColors[server.status] ?? '#546b8a';
@@ -86,7 +94,7 @@ export function ServerCard({ server }: { server: Server }) {
               Editar
             </button>
             <button
-              onClick={handleDelete}
+              onClick={() => setShowDeleteModal(true)}
               className="text-[13px] hover:text-red-400 transition-colors flex items-center gap-1"
               style={{ color: 'var(--text-secondary)' }}
             >
@@ -99,6 +107,55 @@ export function ServerCard({ server }: { server: Server }) {
         )}
       </div>
       {editing && <ServerForm server={server} onClose={() => setEditing(false)} />}
+
+      {/* Delete confirmation modal */}
+      {showDeleteModal && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => !deleting && setShowDeleteModal(false)} />
+          <div
+            className="relative w-full max-w-md card-static rounded-xl p-6 animate-fade-in-scale"
+            style={{ boxShadow: '0 16px 64px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(42, 63, 84, 0.3)' }}
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                <svg className="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-[16px] font-semibold" style={{ color: 'var(--text-primary)' }}>Eliminar servidor</h3>
+                <p className="text-[13px]" style={{ color: 'var(--text-muted)' }}>{server.name}</p>
+              </div>
+            </div>
+            <p className="text-[14px] mb-6" style={{ color: 'var(--text-secondary)' }}>
+              Esta accion es irreversible. Se eliminaran todos los checks, incidentes y notificaciones asociados a este servidor.
+            </p>
+            <div className="flex items-center justify-end gap-3">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                disabled={deleting}
+                className="px-4 py-2 text-[14px] rounded-lg border transition-all disabled:opacity-50"
+                style={{ color: 'var(--text-secondary)', borderColor: 'var(--border)' }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="px-4 py-2 bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white text-[14px] font-medium rounded-lg transition-all flex items-center gap-2"
+              >
+                {deleting ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Eliminando...
+                  </>
+                ) : 'Eliminar'}
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </>
   );
 }

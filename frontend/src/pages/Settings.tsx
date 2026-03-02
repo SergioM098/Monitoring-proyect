@@ -199,7 +199,7 @@ export function Settings() {
       {/* API Keys section */}
       <div className="mt-8 mb-6">
         <h1 className="text-[22px] font-semibold text-[var(--text-primary)]">API Keys</h1>
-        <p className="text-[14px] text-[var(--text-muted)] mt-0.5">Claves para consumir la API externa <code className="bg-[var(--bg-input)] px-1.5 py-0.5 rounded text-[#E1A72C] text-[13px]">/api/v1/*</code></p>
+        <p className="text-[14px] text-[var(--text-muted)] mt-0.5">Claves para consumir la API externa <code className="bg-[var(--bg-input)] px-1.5 py-0.5 rounded text-[#E1A72C] text-[13px]">https://tracking.wowdesarrollos.com/*</code></p>
       </div>
 
       <div className="card-static mb-4 overflow-hidden">

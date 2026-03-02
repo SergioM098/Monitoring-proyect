@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { StatusBadge } from '../components/servers/StatusBadge';
+import { useSocketEvent } from '../hooks/useSocket';
 import api, { downloadCsv } from '../api/client';
 import type { Incident, Server } from '../types';
 
@@ -67,6 +68,44 @@ export function Incidents() {
     setLoading(true);
     fetchIncidents().finally(() => setLoading(false));
   }, [fetchIncidents]);
+
+  // Real-time: new incident created
+  useSocketEvent<{ serverId: string; incident: Incident }>(
+    'incident:created',
+    useCallback(({ incident }: { serverId: string; incident: Incident }) => {
+      setIncidents((prev) => [incident, ...prev]);
+      setTotal((prev) => prev + 1);
+      // Refresh stats
+      api.get('/incidents/stats').then(({ data }) => setStats(data.stats));
+    }, [])
+  );
+
+  // Real-time: incident resolved
+  useSocketEvent<{ serverId: string; incident: Incident }>(
+    'incident:resolved',
+    useCallback(({ incident }: { serverId: string; incident: Incident }) => {
+      setIncidents((prev) =>
+        prev.map((inc) => (inc.id === incident.id ? { ...inc, ...incident } : inc))
+      );
+      // Refresh stats
+      api.get('/incidents/stats').then(({ data }) => setStats(data.stats));
+    }, [])
+  );
+
+  // Real-time: server list changes
+  useSocketEvent<Server>(
+    'server:created',
+    useCallback((server: Server) => {
+      setServers((prev) => [server, ...prev]);
+    }, [])
+  );
+
+  useSocketEvent<{ id: string }>(
+    'server:deleted',
+    useCallback(({ id }: { id: string }) => {
+      setServers((prev) => prev.filter((s) => s.id !== id));
+    }, [])
+  );
 
   const exportCsv = () => {
     const params = new URLSearchParams();

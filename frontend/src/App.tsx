@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { SocketProvider } from './context/SocketContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { ToastProvider } from './context/ToastContext';
+import { GlobalSocketToasts } from './components/GlobalSocketToasts';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { Layout } from './components/layout/Layout';
 import { Login } from './pages/Login';
@@ -19,6 +21,8 @@ export default function App() {
     <ThemeProvider>
     <AuthProvider>
       <SocketProvider>
+        <ToastProvider>
+        <GlobalSocketToasts />
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
@@ -74,6 +78,7 @@ export default function App() {
             />
           </Routes>
         </BrowserRouter>
+        </ToastProvider>
       </SocketProvider>
     </AuthProvider>
     </ThemeProvider>
